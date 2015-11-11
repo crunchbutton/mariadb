@@ -1,0 +1,39 @@
+master:
+  image: tutum/mysql
+  ports:
+    - 3306:3306
+  restart: always
+  cpu_shares: 4096
+  mem_limit: 512m
+  volumes_from:
+    - dbvol_master
+  command: /bin/start master
+  environment:
+    MYSQL_USER: root
+    MYSQL_PASS: root
+
+
+
+slave:
+  image: tutum/mysql
+  target_num_containers: 2
+  deployment_strategy: high_availability
+  ports:
+    - "3306"
+  restart: always
+  cpu_shares: 4096
+  mem_limit: 512m
+  links:
+    - master
+  command: /bin/start node master
+  environment: mysql
+    MYSQL_USER: root
+    MYSQL_PASS: root
+
+
+dbvol_master:
+   image: ubuntu
+   command: sleep 2147483647
+   mem_limit: 64m
+   volumes:
+      - /var/lib/mysql_master:/data
