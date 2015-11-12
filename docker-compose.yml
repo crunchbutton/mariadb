@@ -1,5 +1,5 @@
 master:
-  image: tutum/mysql
+  image: arzynik/docker-mariadb-galera
   ports:
     - 3306:3306
   restart: always
@@ -15,7 +15,7 @@ master:
 
 
 slave:
-  image: tutum/mysql
+  image: arzynik/docker-mariadb-galera
   target_num_containers: 2
   deployment_strategy: high_availability
   ports:
@@ -26,7 +26,7 @@ slave:
   links:
     - master
   command: /bin/start node master
-  environment: mysql
+  environment:
     MYSQL_USER: root
     MYSQL_PASS: root
 
@@ -36,4 +36,4 @@ dbvol_master:
    command: sleep 2147483647
    mem_limit: 64m
    volumes:
-      - /var/lib/mysql_master:/data
+      - /data

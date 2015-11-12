@@ -5,18 +5,27 @@ firstrun() {
 	cp -r /var/lib/mysql/* /data
 	chown -R mysql /data
 	chown root /data/debian*
+
+
+	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
+	echo "CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
+	echo "GRANT ALL on *.* to '$MYSQL_USER'@'%' WITH GRANT OPTION;" >> firstrun.sql
+
+	mysql -h localhost -uroot -proot < firstrun.sql
+
+	#ON_CREATE_DB, MYSQL_PASS, MYSQL_USER
 }
 
 main() {
-	if [[ ! -f /data/debian-5.5.flag ]]
+	if [[ ! -f /data/debian-10.0.flag ]]
 	then
 		firstrun
 	fi
 
 	echo "datadir=/data" >> /etc/mysql/my.cnf
 	echo "wsrep_data_home_dir=/data/" >> /etc/mysql/my.cnf
-	#echo "gcache.dir = /var/lib/mysql/" >> /etc/mysql/my.cnf
-	#echo "gcache.name = /var/lib/mysql/galera.cache"  >> /etc/mysql/my.cnf
+	#echo "gcache.dir = /data/" >> /etc/mysql/my.cnf
+	#echo "gcache.name = /data/galera.cache"  >> /etc/mysql/my.cnf
 
 	case "$1" in
 		master)

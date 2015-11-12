@@ -1,11 +1,10 @@
 #!/bin/bash
 
 docker rm -f docker-mariadb-galera
+docker rm -f master
+docker rm -f slave
 docker build -f Dockerfile -t docker-mariadb-galera .
-docker run -d -v /data --name db_vol -p 222:22 ubuntu sleep 2147483647
+docker run -d -v /data --name dbdata -p 222:22 ubuntu sleep 2147483647
 
-docker run --volumes-from db_vol -p 3308:3306 --name master -d docker-mariadb-galera /bin/start master
-docker run -p 3307:3306 --name slave --link master:master -d docker-mariadb-galera /bin/start node master
-#-v /data:/data
-
-#docker run -p 3308:3306 --name ubuntu ubuntu /bin/bash
+docker run --volumes-from dbdata -p 3308:3306 -d -e MYSQL_USER=devin -e MYSQL_PASS=root --name db1 -d docker-mariadb-galera /bin/start master
+docker run -p 3307:3306 --name db2 --link db1 -e MYSQL_USER=devin -e MYSQL_PASS=root -d docker-mariadb-galera /bin/start node db1
