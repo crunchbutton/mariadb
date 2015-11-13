@@ -1,0 +1,25 @@
+node:
+  image: arzynik/docker-mariadb-galera
+  target_num_containers: 1
+  deployment_strategy: high_availability
+  ports:
+    - "3306"
+  restart: always
+  cpu_shares: 4096
+  mem_limit: 512m
+  volumes_from:
+    - dbdata
+  command: /bin/start node db3.crunchbutton.com
+  environment:
+    MYSQL_USER: root
+    MYSQL_PASS: root
+    CLUSTER_AUTH: cbuser:cbt4c0
+    CLUSTER_NAME: crunchbutton
+
+
+dbdata:
+   image: ubuntu
+   command: sleep 2147483647
+   mem_limit: 64m
+   volumes:
+      - /data

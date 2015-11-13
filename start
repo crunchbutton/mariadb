@@ -6,23 +6,25 @@ firstrun() {
 	chown -R mysql /data
 	chown root /data/debian*
 
-
-	#echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
-	#echo "CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
-	#echo "GRANT ALL on *.* to '$MYSQL_USER'@'%' WITH GRANT OPTION;" >> firstrun.sql
-
-	#mysql -h localhost -uroot -proot < firstrun.sql
-
-	#ON_CREATE_DB, MYSQL_PASS, MYSQL_USER
-
 	echo "[galera]" >> /etc/mysql/conf.d/galera.cnf
 	echo "wsrep_sst_auth=$CLUSTER_AUTH" >> /etc/mysql/conf.d/galera.cnf
 	echo "wsrep_cluster_name=$CLUSTER_NAME" >> /etc/mysql/conf.d/galera.cnf
 
-
-
 	#echo "gcache.dir = /data/" >> /etc/mysql/my.cnf
 	#echo "gcache.name = /data/galera.cache"  >> /etc/mysql/my.cnf
+	echo "datadir=/data"  >> /etc/mysql/my.cnf
+	echo "wsrep_data_home_dir=/data/"  >> /etc/mysql/my.cnf
+
+	service mysql start
+
+	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
+	echo "CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
+	echo "GRANT ALL on *.* to '$MYSQL_USER'@'%' WITH GRANT OPTION;" >> firstrun.sql
+	mysql -h localhost -uroot -proot < firstrun.sql
+
+	#ON_CREATE_DB, MYSQL_PASS, MYSQL_USER
+
+	service mysql stop
 
 }
 
