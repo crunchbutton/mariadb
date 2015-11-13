@@ -37,7 +37,7 @@ main() {
 	case "$1" in
 		master)
 			echo "Starting master"
-			/usr/bin/mysqld_safe --wsrep_cluster_address=gcomm:// --wsrep-new-cluster
+			/usr/bin/mysqld_safe --wsrep_cluster_address=gcomm:// --wsrep-new-cluster  --wsrep_cluster_name=$CLUSTER_NAME --wsrep_sst_auth=$CLUSTER_AUTH
 			;;
 		node)
 			echo "Starting node"
@@ -45,7 +45,7 @@ main() {
 			then
 				echo "Missing master node IP"
 			else
-				/usr/bin/mysqld_safe --wsrep_cluster_address=gcomm://$2
+				/usr/bin/mysqld_safe --wsrep_cluster_address=gcomm://$2  --wsrep_cluster_name=$CLUSTER_NAME --wsrep_sst_auth=$CLUSTER_AUTH
 			fi
 			;;
 		*)
