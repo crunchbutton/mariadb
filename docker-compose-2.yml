@@ -9,7 +9,7 @@ node:
   mem_limit: 512m
   volumes_from:
     - dbdata
-  command: /bin/start node db3.crunchbutton.com
+  command: /bin/start node 192.168.190.21
   environment:
     MYSQL_USER: root
     MYSQL_PASS: root

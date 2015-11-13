@@ -2,7 +2,7 @@
 
 firstrun() {
 	echo "First run"
-	cp -r /var/lib/mysql/* /data
+	#cp -r /var/lib/mysql/* /data
 	chown -R mysql /data
 	chown root /data/debian*
 
