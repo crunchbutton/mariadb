@@ -7,13 +7,23 @@ firstrun() {
 	chown root /data/debian*
 
 
-	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
-	echo "CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
-	echo "GRANT ALL on *.* to '$MYSQL_USER'@'%' WITH GRANT OPTION;" >> firstrun.sql
+	#echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
+	#echo "CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASS';" >> firstrun.sql
+	#echo "GRANT ALL on *.* to '$MYSQL_USER'@'%' WITH GRANT OPTION;" >> firstrun.sql
 
-	mysql -h localhost -uroot -proot < firstrun.sql
+	#mysql -h localhost -uroot -proot < firstrun.sql
 
 	#ON_CREATE_DB, MYSQL_PASS, MYSQL_USER
+
+	echo "[galera]" >> /etc/mysql/conf.d/galera.cnf
+	echo "wsrep_sst_auth=$CLUSTER_AUTH" >> /etc/mysql/conf.d/galera.cnf
+	echo "wsrep_cluster_name=$CLUSTER_NAME" >> /etc/mysql/conf.d/galera.cnf
+
+
+
+	#echo "gcache.dir = /data/" >> /etc/mysql/my.cnf
+	#echo "gcache.name = /data/galera.cache"  >> /etc/mysql/my.cnf
+
 }
 
 main() {
@@ -22,17 +32,10 @@ main() {
 		firstrun
 	fi
 
-	echo "datadir=/data" >> /etc/mysql/my.cnf
-	echo "wsrep_data_home_dir=/data/" >> /etc/mysql/my.cnf
-	#echo "gcache.dir = /data/" >> /etc/mysql/my.cnf
-	#echo "gcache.name = /data/galera.cache"  >> /etc/mysql/my.cnf
-
 	case "$1" in
 		master)
 			echo "Starting master"
-			#echo "wsrep_cluster_address=gcomm://" >> /etc/mysql/my.cnf
 			/usr/bin/mysqld_safe --wsrep_cluster_address=gcomm:// --wsrep-new-cluster
-			# --wsrep-new-cluster
 			;;
 		node)
 			echo "Starting node"
@@ -40,7 +43,6 @@ main() {
 			then
 				echo "Missing master node IP"
 			else
-				#echo "wsrep_cluster_address=gcomm://$2" >> /etc/mysql/my.cnf
 				/usr/bin/mysqld_safe --wsrep_cluster_address=gcomm://$2
 			fi
 			;;
